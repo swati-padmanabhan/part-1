@@ -64,7 +64,7 @@ namespace ContactAppProject.Controllers
                                 {
                                     FormsAuthentication.SetAuthCookie(loginVM.UserName, true);
                                     Session["UserId"] = getUser.Id;
-                                    return RedirectToAction("ViewStaffDetails", "Staff");
+                                    return RedirectToAction("Index", "Contact");
                                 }
                             }
                         }
@@ -162,6 +162,7 @@ namespace ContactAppProject.Controllers
             }
 
         }
+
 
         public ActionResult ViewContacts(Guid userId)
         {
