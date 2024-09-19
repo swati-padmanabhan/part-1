@@ -12,8 +12,8 @@ namespace ContactAppProject.Mappings
             Map(c => c.FirstName);
             Map(c => c.LastName);
             Map(c => c.IsActive);
-            References(c => c.User).Columns("UserId").Unique().Cascade.None();
-            HasMany(c => c.ContactsDetails).Inverse().Cascade.All();
+            References(c => c.User).Column("UserId").Cascade.None().Nullable();
+            HasMany(cd => cd.ContactsDetails).Inverse().Cascade.All();
         }
     }
 }

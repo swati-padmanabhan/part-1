@@ -16,8 +16,8 @@ namespace ContactAppProject.Mappings
             Map(u => u.Email);
             Map(u => u.IsAdmin);
             Map(u => u.IsActive);
-            HasOne(u => u.Role).Cascade.All().PropertyRef(r => r.User).Constrained();
-            HasMany(u => u.Contacts).Inverse().Cascade.All();
+            HasOne(r => r.Role).Cascade.All().PropertyRef(r => r.User).Constrained();
+            HasMany(c => c.Contacts).Inverse().Cascade.All();
         }
     }
 }

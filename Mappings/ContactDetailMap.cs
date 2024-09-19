@@ -3,7 +3,7 @@ using FluentNHibernate.Mapping;
 
 namespace ContactAppProject.Mappings
 {
-    public class ContactDetailMap : ClassMap<ContactDetail>
+    public class ContactDetailMap : ClassMap<ContactDetails>
     {
         public ContactDetailMap()
         {
@@ -11,7 +11,7 @@ namespace ContactAppProject.Mappings
             Id(cd => cd.Id).GeneratedBy.GuidComb();
             Map(cd => cd.Number);
             Map(cd => cd.Email);
-            References(cd => cd.Contact).Column("ContactId").Unique().Cascade.None();
+            References(cd => cd.Contact).Column("ContactId").Cascade.None().Nullable();
         }
     }
 }

@@ -15,38 +15,156 @@ namespace ContactAppProject.Controllers
             return View();
         }
 
-        public ActionResult GetAllContacts(Guid userId)
+
+        //public ActionResult GetAllContacts()
+        //{
+        //    if (Session["UserId"] == null)
+        //    {
+        //        return RedirectToAction("Login", "User");
+        //    }
+        //    Guid userId = (Guid)Session["UserId"]; // Retrieve userId from the session
+        //    using (var session = NHibernateHelper.CreateSession())
+        //    {
+        //        // Eager load User and Contacts to avoid lazy loading outside the session
+        //        var user = session.Query<User>()
+        //                          .FetchMany(u => u.Contacts) // Ensure Contacts are fetched eagerly
+        //                          .FirstOrDefault(u => u.Id == userId);
+
+
+        //        var contacts = user.Contacts.Select(c => new Contact
+        //        {
+        //            Id = c.Id,
+        //            FirstName = c.FirstName,
+        //            LastName = c.LastName,
+        //            IsActive = c.IsActive
+        //        }).ToList();
+
+
+
+        //        return Json(contacts, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
+
+        public ActionResult GetAllContacts()
         {
-            userId = (Guid)Session["UserId"];
+            if (Session["UserId"] == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            Guid userId = (Guid)Session["UserId"]; // Retrieve userId from the session
             using (var session = NHibernateHelper.CreateSession())
             {
-                var contacts = session.Query<Contact>().Where(c => c.User.Id == userId).ToList();
+                // Fetch contacts directly by UserId
+                var contacts = session.Query<Contact>()
+                                      .Where(c => c.User.Id == userId)
+                                      .Select(c => new Contact
+                                      {
+                                          Id = c.Id,
+                                          FirstName = c.FirstName,
+                                          LastName = c.LastName,
+                                          IsActive = c.IsActive
+                                      })
+                                      .ToList();
 
-                if (contacts.Count > 0)
-                {
-                    return Json(contacts, JsonRequestBehavior.AllowGet);
-                }
-                return new HttpStatusCodeResult(500);
+                return Json(contacts, JsonRequestBehavior.AllowGet);
             }
         }
 
+        [HttpPost]
         public ActionResult AddContact(Contact contact)
+        {
+            if (Session["UserId"] == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            Guid userId = (Guid)Session["UserId"]; // Retrieve userId from the session
+            using (var session = NHibernateHelper.CreateSession())
+            {
+                using (var txn = session.BeginTransaction())
+                {
+                    var user = session.Query<User>().FirstOrDefault(u => u.Id == userId);
+                    if (user == null)
+                    {
+                        return Json(new { success = false, message = "User not found" }, JsonRequestBehavior.AllowGet);
+                    }
+                    contact.User = user;
+
+                    session.Save(contact);
+                    txn.Commit();
+                }
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
+
+        public ActionResult GetContact(Guid contactId)
         {
             using (var session = NHibernateHelper.CreateSession())
             {
                 using (var txn = session.BeginTransaction())
                 {
-                    contact.User = session.Get<User>(Session["UserId"]);
-                    session.Save(contact);
-                    txn.Commit();
-                    return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                    var contact = session.Get<Contact>(contactId);
+                    if (contact == null)
+                    {
+                        return Json(new { success = false, message = "Contact not found" }, JsonRequestBehavior.AllowGet);
+                    }
+
+                    return Json(contact, JsonRequestBehavior.AllowGet);
                 }
+            }
+        }
 
+        [HttpPost]
+        public ActionResult EditContact(Contact contact)
+        {
+            using (var session = NHibernateHelper.CreateSession())
+            {
+                using (var txn = session.BeginTransaction())
+                {
+                    var existingContact = session.Query<Contact>().FirstOrDefault(c => c.Id == contact.Id);
+                    if (existingContact != null)
+                    {
+                        existingContact.FirstName = contact.FirstName;
+                        existingContact.LastName = contact.LastName;
+                        session.Update(existingContact);
+                        txn.Commit();
 
+                        return Json(new { success = true, contact = existingContact }, JsonRequestBehavior.AllowGet);
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = "Contact not found" }, JsonRequestBehavior.AllowGet);
+                    }
+                }
+            }
+        }
+
+        [HttpPost]
+        public ActionResult UpdateIsActiveStatus(Guid contactId, bool isActive)
+        {
+            using (var session = NHibernateHelper.CreateSession())
+            {
+                using (var txn = session.BeginTransaction())
+                {
+                    var contact = session.Get<Contact>(contactId);
+                    if (contact != null)
+                    {
+                        contact.IsActive = isActive;
+                        session.Update(contact);
+                        txn.Commit();
+                        return Json(new { success = true });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = "Contact not found" });
+                    }
+                }
             }
 
         }
-
 
     }
 }

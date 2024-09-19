@@ -40,6 +40,11 @@ namespace ContactAppProject
             using (var session = NHibernateHelper.CreateSession())
             {
                 var user = session.Query<User>().SingleOrDefault(u => u.UserName == username);
+                //if no user found, then return empty string
+                if (user == null)
+                {
+                    return new string[] { };
+                }
                 return new string[] { user.Role.RoleName };
             }
         }

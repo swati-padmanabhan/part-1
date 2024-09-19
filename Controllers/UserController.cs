@@ -179,7 +179,7 @@ namespace ContactAppProject.Controllers
             TempData["contactId"] = contactId;
             using (var session = NHibernateHelper.CreateSession())
             {
-                var contactDetails = session.Query<ContactDetail>().Where(c => c.Contact.Id == contactId).ToList();
+                var contactDetails = session.Query<ContactDetails>().Where(c => c.Contact.Id == contactId).ToList();
                 return View(contactDetails);
             }
         }

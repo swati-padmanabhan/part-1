@@ -39,24 +39,23 @@
     </table>
 </div>
 
-@*<input type="hidden" id="userId" value="@TempData["userId"]" />*@
 
-@*<div id="newContact" style="display:none" class="container">
+<div id="newContact" style="display:none" class="container">
         @Html.Partial("_AddContactPartial")
     </div>
 
     <div id="editContact" style="display:none" class="container">
         @Html.Partial("_EditContactPartial")
-    </div>*@
+    </div>
 
 @*scripts*@
 
-<input type="hidden" id="userId" value="@TempData["userId"]" />
 
 <script src="~/Scripts/myCrud.js"></script>
 <script>
     $(document).ready(() => {
-        loadContacts();  
+        
+        loadContacts();
     });
 </script>
 

@@ -21,7 +21,7 @@ namespace ContactAppProject.Models
 
         public virtual bool IsActive { get; set; } = true;
 
-        public virtual IList<Contact> Contacts { get; set; } = new List<Contact>();
+        public virtual IList<Contact> Contacts { get; set; }
 
         public virtual Role Role { get; set; } = new Role();
     }

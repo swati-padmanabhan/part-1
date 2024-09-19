@@ -62,7 +62,7 @@
                 var userId = $(this).data('user-id');
 
                 $.ajax({
-                    url: '@Url.Action("UpdateIsActiveStatus")',
+                    url: '@Url.Action("/User/UpdateIsActiveStatus")',
                     type: 'POST',
                     data: { userId: userId, isActive: isActive },
                     success: function (response) {
